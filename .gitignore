@@ -1,0 +1,5 @@
+# the game is yours, never commit it
+gamefiles/*
+!gamefiles/README.md
+maps/*
+!maps/README.md

@@ -1,0 +1,68 @@
+# COD1.6X LAN servers. One block per server: copy a block, give it a new name, a new PORT
+# (and the same port in "ports"), a new volume - that's a new server.
+#
+#   docker compose up -d --build     build the image (first time / after changing gamefiles/ or maps/) and start all
+#   docker compose up -d server2     start one
+#   docker compose logs -f server1   its console output
+#   docker attach cod1-server1       its console (type commands, Ctrl+P Ctrl+Q to leave it running)
+#   docker compose down              stop all (the volumes, i.e. logs and demos, are kept)
+#
+# Settings (all optional, defaults in brackets):
+#   PORT          UDP port [28960] - 28960..28963 are the ones the in-game LAN tab scans
+#   SV_HOSTNAME   name in the browser [COD1.6X LAN]
+#   GAMETYPE      sd, dm, tdm, re, bel, hq [sd]
+#   MAP           first map [mp_harbor]
+#   MAPROTATION   e.g. "gametype sd map mp_harbor map mp_carentan" [the first map only]
+#   MAXCLIENTS    [16]
+#   PASSWORD      join password [none]
+#   RCON_PASSWORD [a random one, printed in the logs at every start]
+#   PAM_MODE      pub, comp, comp_mr12, comp_lan, pub_2v2... (PAM's list) [comp]
+#   SV_FPS        [40]
+#   DEDICATED     1 = LAN, 2 = internet (masters, rate limits) [1]
+#   EXTRA_CFG     a .cfg in servers/ executed last, for anything else [none]
+
+x-cod1: &cod1
+  build: .
+  image: cod1plus/cod1-server:local
+  restart: unless-stopped
+  stdin_open: true
+  tty: true
+
+services:
+  server1:
+    <<: *cod1
+    container_name: cod1-server1
+    ports:
+      - "28960:28960/udp"
+    environment:
+      PORT: 28960
+      SV_HOSTNAME: "COD1.6X LAN #1"
+      GAMETYPE: sd
+      MAP: mp_harbor
+      MAPROTATION: "gametype sd map mp_harbor map mp_carentan map mp_brecourt map mp_depot"
+      PAM_MODE: comp
+      RCON_PASSWORD: change-me
+      EXTRA_CFG: server1.cfg
+    volumes:
+      - ./servers:/servers:ro
+      - server1:/data
+
+  server2:
+    <<: *cod1
+    container_name: cod1-server2
+    ports:
+      - "28961:28961/udp"
+    environment:
+      PORT: 28961
+      SV_HOSTNAME: "COD1.6X LAN #2"
+      GAMETYPE: sd
+      MAP: mp_carentan
+      PAM_MODE: comp
+      RCON_PASSWORD: change-me
+    volumes:
+      - ./servers:/servers:ro
+      - server2:/data
+
+volumes:
+  server1:
+  server2:
