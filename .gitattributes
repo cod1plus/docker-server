@@ -2,3 +2,7 @@
 * text=auto eol=lf
 *.pk3 binary
 *.so binary
+# ...except what Windows itself runs or opens
+*.bat text eol=crlf
+*.ps1 text eol=crlf
+lan/*.txt text eol=crlf

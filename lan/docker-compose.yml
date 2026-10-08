@@ -1,0 +1,74 @@
+# COD1.6X LAN - image toute prete (jeu + PAM + cod1plus.so) : rien a construire.
+# DEMARRER.bat charge l'image depuis cod1-lan-*.tar la premiere fois, puis lance ces serveurs.
+#
+# Un bloc = un serveur. Pour en ajouter un : copier un bloc, changer son nom, container_name,
+# PORT (et le meme numero dans "ports") et son volume (+ l'ajouter tout en bas sous volumes:).
+# Les joueurs se connectent par IP (/connect IP:28960) : sous Windows, Docker ne relaie pas les
+# broadcasts de l'onglet LAN du jeu. Astuce : ajouter le serveur en favori.
+#
+# Reglages (tous optionnels) :
+#   PORT          port UDP [28960]
+#   SV_HOSTNAME   nom dans la liste des serveurs
+#   GAMETYPE      sd, dm, tdm, re, bel, hq [sd]
+#   MAP           premiere carte [mp_harbor]
+#   MAPROTATION   ex. "gametype sd map mp_harbor map mp_carentan"
+#   MAXCLIENTS    [16]
+#   PASSWORD      mot de passe pour rejoindre [aucun]
+#   RCON_PASSWORD mot de passe rcon (en jeu : /rconPassword ... puis /rcon map mp_carentan)
+#   PAM_MODE      comp, pub, comp_mr12, comp_lan, pub_2v2... (liste de PAM) [comp]
+#   SV_FPS        [40]
+#   EXTRA_CFG     un .cfg du dossier servers\ execute en dernier (tout le reste)
+#   COD1RELOADED_MIN_BUILD_AUTO "0" : au LAN, pas d'obligation d'avoir le tout dernier client 1.6X
+#   COD1RELOADED_PURE_EXTRA "0" : les packs de textures HD ne sont pas acceptes sur ces serveurs (un
+#                 joueur qui les a joue sans, et n'est jamais kicke "unpure") - "1" pour les accepter
+
+x-cod1: &cod1
+  image: ${COD1_IMAGE}
+  restart: unless-stopped
+  stdin_open: true
+  tty: true
+
+services:
+  server1:
+    <<: *cod1
+    container_name: cod1-server1
+    ports:
+      - "28960:28960/udp"
+    environment:
+      PORT: 28960
+      SV_HOSTNAME: "COD1.6X LAN #1"
+      GAMETYPE: sd
+      MAP: mp_harbor
+      MAPROTATION: "gametype sd map mp_harbor map mp_carentan map mp_brecourt map mp_depot map mp_dawnville map mp_railyard map mp_powcamp map mp_neuville"
+      PAM_MODE: comp
+      RCON_PASSWORD: change-moi
+      EXTRA_CFG: server1.cfg
+      COD1RELOADED_MIN_BUILD_AUTO: "0"
+      COD1RELOADED_PURE_EXTRA: "0"
+    volumes:
+      - ./servers:/servers:ro
+      - server1:/data
+
+  server2:
+    <<: *cod1
+    container_name: cod1-server2
+    ports:
+      - "28961:28961/udp"
+    environment:
+      PORT: 28961
+      SV_HOSTNAME: "COD1.6X LAN #2"
+      GAMETYPE: sd
+      MAP: mp_carentan
+      MAPROTATION: "gametype sd map mp_carentan map mp_harbor map mp_depot map mp_brecourt map mp_dawnville map mp_railyard map mp_powcamp map mp_neuville"
+      PAM_MODE: comp
+      RCON_PASSWORD: change-moi
+      EXTRA_CFG: server2.cfg
+      COD1RELOADED_MIN_BUILD_AUTO: "0"
+      COD1RELOADED_PURE_EXTRA: "0"
+    volumes:
+      - ./servers:/servers:ro
+      - server2:/data
+
+volumes:
+  server1:
+  server2:

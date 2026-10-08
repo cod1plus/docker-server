@@ -1,0 +1,41 @@
+COD1.6X - SERVEURS POUR LAN (Docker sous Windows)
+==================================================
+
+Ce dossier contient tout : le jeu cote serveur, le PAM officiel (celui du bouton
+"INSTALL / UPDATE PAM" des clients 1.6X) et le module cod1plus.so, dans une image Docker.
+Rien a telecharger ni a compiler le jour du LAN.
+
+A FAIRE UNE FOIS SUR LE PC SERVEUR
+1. Installer Docker Desktop : https://www.docker.com/products/docker-desktop/
+   (WSL 2 / conteneurs Linux = les reglages par defaut). Redemarrer si demande.
+2. Double-cliquer OUVRIR-PORTS-ADMIN.bat (accepte la demande administrateur) :
+   ouvre les ports UDP 28960-28969 dans le pare-feu Windows.
+
+LE JOUR DU LAN
+- DEMARRER.bat     lance les serveurs (la 1re fois il charge l'image : 1-2 minutes)
+                   et affiche l'adresse IP de ce PC.
+- ARRETER.bat      arrete les serveurs.
+- CONSOLE.bat      console d'un serveur (map mp_carentan, map_restart, status, kick...).
+                   Quitter sans arreter le serveur : Ctrl+P puis Ctrl+Q.
+- LOGS.bat         ce qu'affichent les serveurs.
+- REPARER-DOCKER.bat  si Docker Desktop ne demarre plus ("The file cannot be accessed by
+                   the system" sur dockerInference / engine.sock).
+
+LES JOUEURS
+- Client COD1.6X (1.6.x) avec le PAM installe par le bouton "INSTALL / UPDATE PAM".
+- Dans la console du jeu :  /connect IP-DU-PC-SERVEUR:28960   (serveur 2 : port 28961)
+  L'onglet LAN du jeu ne les liste PAS (sous Windows, Docker ne relaie pas ses broadcasts) :
+  connexion par IP, ou ajout en favori. Les serveurs sont "pure" : les fichiers doivent etre ceux du PAM
+  officiel, sinon le jeu les telecharge depuis le serveur.
+
+REGLAGES
+- docker-compose.yml : un bloc par serveur (nom, carte, rotation, mode PAM, mots de passe,
+  port). 2 serveurs par defaut ; pour un 3e, copier un bloc (voir les explications en haut
+  du fichier). Changer RCON_PASSWORD (change-moi par defaut).
+- servers\server1.cfg, server2.cfg : toute autre cvar serveur.
+- Apres un changement : ARRETER.bat puis DEMARRER.bat.
+- Les logs, demos et cvars archivees de chaque serveur sont gardes dans un volume Docker
+  (server1, server2), meme apres ARRETER.bat.
+
+L'image contient les fichiers du jeu Call of Duty : ne la diffusez qu'entre joueurs qui
+possedent le jeu.

@@ -73,6 +73,26 @@ named by `EXTRA_CFG` and executed last (see `servers/server1.cfg`). A `competiti
 Logs, demos and archived cvars live in one Docker volume per server (`server1`, `server2`...),
 kept across restarts and `down`. `docker compose down -v` deletes them.
 
+## Ready-made LAN package (Windows)
+
+For a LAN organiser who should not have to build anything: one machine with the game files
+builds the image once and exports it with the `lan/` folder.
+
+```powershell
+powershell -ExecutionPolicy Bypass -File tools\make-lan-package.ps1 -Context C:\cod1-lan-build -Out C:\cod1-lan
+```
+
+`-Context` is this repository with `gamefiles/` filled (a copy outside OneDrive is better for
+the ~1.2 GB of paks). `C:\cod1-lan` then holds `cod1-lan-<tag>.tar` (the whole image: game,
+official PAM, cod1plus.so), `.env` naming it, and the French one-click scripts:
+`DEMARRER.bat` (starts Docker Desktop if needed, loads the image the first time, starts the
+servers, prints the machine's LAN address), `ARRETER.bat`, `CONSOLE.bat`, `LOGS.bat`,
+`OUVRIR-PORTS-ADMIN.bat` (Windows firewall, UDP 28960-28969) and `REPARER-DOCKER.bat` (Docker
+Desktop that no longer starts because Windows cannot delete the sockets it left behind:
+`...\dockerInference` / `docker-secrets-engine\engine.sock: The file cannot be accessed by the
+system`). See `lan/LISEZMOI.txt`. The image contains the game's files: share it only between
+people who own the game.
+
 ## LAN notes
 
 - `DEDICATED: 1` (the default) is a LAN server: no internet master, and players on a LAN
